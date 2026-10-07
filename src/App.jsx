@@ -3,28 +3,32 @@ import { QRCodeCanvas } from "qrcode.react";
 import "./App.css";
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [patientName, setPatientName] = useState("");
-  const [department, setDepartment] = useState("General Medicine");
-  const [doctor, setDoctor] = useState("Dr. Mannu");
+  const [token, setToken] = useState(
+  JSON.parse(localStorage.getItem("token")) || null
+);
+
+const [patientName, setPatientName] = useState(
+  localStorage.getItem("patientName") || ""
+);
+
+const [department, setDepartment] = useState(
+  localStorage.getItem("department") || "General Medicine"
+);
+
+const [doctor, setDoctor] = useState(
+  localStorage.getItem("doctor") || "Dr. Mannu"
+);
   const [cancelled, setCancelled] = useState(false);
   const [peopleAhead, setPeopleAhead] = useState(10);
   const [nowServing, setNowServing] = useState(1);
 
+  
   useEffect(() => {
-    const timer = setInterval(() => {
-      setPeopleAhead((prev) => {
-        if (prev <= 0) {
-          return 0;
-        }
-        return prev - 1;
-      });
-
-      setNowServing((prev) => prev + 1);
-    }, 10000);
-
-    return () => clearInterval(timer);
-  }, []);
+  localStorage.setItem("token", JSON.stringify(token));
+  localStorage.setItem("patientName", patientName);
+  localStorage.setItem("department", department);
+  localStorage.setItem("doctor", doctor);
+}, [token, patientName, department, doctor]);
 
   function joinQueue() {
     setCancelled(false);
@@ -43,6 +47,16 @@ function App() {
     setToken(null);
     setCancelled(true);
   }
+   function nextPatient() {
+  setNowServing((prev) => prev + 1);
+
+  setPeopleAhead((prev) => {
+    if (prev <= 0) {
+      return 0;
+    }
+    return prev - 1;
+  });
+}
 
   return (
     <div className="app">
@@ -189,6 +203,9 @@ function App() {
               <span>👥 Patients Ahead</span>
               <strong>{token ? peopleAhead : "--"}</strong>
             </div>
+            <button onClick={nextPatient} className="next-patient-btn">
+            Next Patient
+            </button>
 
             <div className="dashboard-item">
               <span>⏱ Estimated Wait</span>
