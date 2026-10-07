@@ -4,32 +4,34 @@ import "./App.css";
 
 function App() {
   const [token, setToken] = useState(
-  JSON.parse(localStorage.getItem("token")) || null
-);
+    JSON.parse(localStorage.getItem("token")) || null
+  );
 
-const [patientName, setPatientName] = useState(
-  localStorage.getItem("patientName") || ""
-);
+  const [patientName, setPatientName] = useState(
+    localStorage.getItem("patientName") || ""
+  );
 
-const [department, setDepartment] = useState(
-  localStorage.getItem("department") || "General Medicine"
-);
+  const [department, setDepartment] = useState(
+    localStorage.getItem("department") || "General Medicine"
+  );
 
-const [doctor, setDoctor] = useState(
-  localStorage.getItem("doctor") || "Dr. Mannu"
-);
+  const [doctor, setDoctor] = useState(
+    localStorage.getItem("doctor") || "Dr. Mannu"
+  );
+
   const [cancelled, setCancelled] = useState(false);
   const [peopleAhead, setPeopleAhead] = useState(10);
   const [nowServing, setNowServing] = useState(1);
 
-  
+  // Save data in localStorage
   useEffect(() => {
-  localStorage.setItem("token", JSON.stringify(token));
-  localStorage.setItem("patientName", patientName);
-  localStorage.setItem("department", department);
-  localStorage.setItem("doctor", doctor);
-}, [token, patientName, department, doctor]);
+    localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem("patientName", patientName);
+    localStorage.setItem("department", department);
+    localStorage.setItem("doctor", doctor);
+  }, [token, patientName, department, doctor]);
 
+  // Join Queue
   function joinQueue() {
     setCancelled(false);
 
@@ -43,20 +45,24 @@ const [doctor, setDoctor] = useState(
     setPeopleAhead(10);
   }
 
+  // Cancel Queue
   function cancelQueue() {
     setToken(null);
     setCancelled(true);
   }
-   function nextPatient() {
-  setNowServing((prev) => prev + 1);
 
-  setPeopleAhead((prev) => {
-    if (prev <= 0) {
-      return 0;
-    }
-    return prev - 1;
-  });
-}
+  // Next Patient
+  function nextPatient() {
+    setNowServing((prev) => prev + 1);
+
+    setPeopleAhead((prev) => {
+      if (prev <= 0) {
+        return 0;
+      }
+
+      return prev - 1;
+    });
+  }
 
   return (
     <div className="app">
@@ -183,6 +189,7 @@ const [doctor, setDoctor] = useState(
 
           <div className="dashboard-box">
 
+            {/* Now Serving */}
             <div className="dashboard-item">
               <span>🩺 Now Serving</span>
               <strong>
@@ -190,6 +197,7 @@ const [doctor, setDoctor] = useState(
               </strong>
             </div>
 
+            {/* Your Token */}
             <div className="dashboard-item">
               <span>🎫 Your Token</span>
               <strong>
@@ -199,14 +207,15 @@ const [doctor, setDoctor] = useState(
               </strong>
             </div>
 
+            {/* Patients Ahead */}
             <div className="dashboard-item">
               <span>👥 Patients Ahead</span>
-              <strong>{token ? peopleAhead : "--"}</strong>
+              <strong>
+                {token ? peopleAhead : "--"}
+              </strong>
             </div>
-            <button onClick={nextPatient} className="next-patient-btn">
-            Next Patient
-            </button>
 
+            {/* Estimated Wait */}
             <div className="dashboard-item">
               <span>⏱ Estimated Wait</span>
               <strong>
@@ -216,9 +225,18 @@ const [doctor, setDoctor] = useState(
 
           </div>
 
+          {/* Queue Live */}
           <p className="live">
             🟢 Queue is Live
           </p>
+
+          {/* Next Patient */}
+          <button
+            onClick={nextPatient}
+            className="next-patient-btn"
+          >
+            Next Patient
+          </button>
 
         </div>
 
