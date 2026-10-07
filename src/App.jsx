@@ -1,26 +1,36 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import "./App.css";
 
 function App() {
   const [token, setToken] = useState(null);
-  const[peopleAhead ,setpeopleAhead] = useState (5);
-  
-  useEffect(() => {
-  const timer = setInterval(() => {
-    setPeopleAhead((prev) => {
-      if (prev <= 0) {
-        return 0;
-      }
-      return prev - 1;
-    });
-  }, 10000);
+  const [patientName, setPatientName] = useState("");
+  const [department, setDepartment] = useState("General Medicine");
+  const [doctor, setDoctor] = useState("Dr. Mannu");
+  const [cancelled, setCancelled] = useState(false);
+  const [peopleAhead, setPeopleAhead] = useState(10);
 
-  return () => clearInterval(timer);
-}, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPeopleAhead((prev) => {
+        if (prev <= 0) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 10000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   function joinQueue() {
-    setToken (Math.floor(Math.random() * 50) + 1);
+    setCancelled(false);
+    setToken((prev) => (prev ? prev + 1 : 1));
+  }
+
+  function cancelQueue() {
+    setToken(null);
+    setCancelled(true);
   }
 
   return (
@@ -33,31 +43,46 @@ function App() {
 
       <main className="container">
 
+        {/* Booking Card */}
         <div className="card">
           <h2>Book Your Queue</h2>
 
+          <label>Patient Name</label>
+
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+          />
+
           <label>Department</label>
 
-          <select>
+          <select
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+          >
             <option>General Medicine</option>
             <option>Cardiology</option>
             <option>Orthopedic</option>
             <option>Dental</option>
             <option>ENT SPECIALIST</option>
             <option>Neurologist</option>
-            <option>phychiatrist</option>
-        
+            <option>Psychiatrist</option>
           </select>
 
           <label>Doctor</label>
 
-          <select>
-            <option>Dr.MANNU</option>
-            <option>Dr.AMIT</option>
-            <option>Dr.DILKHUSH</option>
-            <option>Dr.SHUBHAM</option>
-            <option>Dr.RIYANSH</option>
-            <option>Dr.SARTHAK</option>
+          <select
+            value={doctor}
+            onChange={(e) => setDoctor(e.target.value)}
+          >
+            <option>Dr. Mannu</option>
+            <option>Dr. Amit</option>
+            <option>Dr. Dilkhush</option>
+            <option>Dr. Shubham</option>
+            <option>Dr. Riyansh</option>
+            <option>Dr. Sarthak</option>
           </select>
 
           <button onClick={joinQueue}>
@@ -69,30 +94,61 @@ function App() {
               <h2>Your Token</h2>
 
               <div className="token">
-                A-{token}
+                A-{String(token).padStart(3, "0")}
               </div>
 
               <p>
-                Patients Ahead: <b>7</b>
+                Patient Name: <b>{patientName}</b>
               </p>
 
               <p>
-                Estimated Wait:{peopleAhead *5} Minutes
+                Department: <b>{department}</b>
+              </p>
+
+              <p>
+                Doctor: <b>{doctor}</b>
+              </p>
+
+              <p>
+                Patients Ahead: <b>{peopleAhead}</b>
+              </p>
+
+              <p>
+                Estimated Wait: <b>{peopleAhead * 5} Minutes</b>
               </p>
 
               <p className="live">
                 🟢 Queue is Live
               </p>
+
+              <button onClick={cancelQueue}>
+                Cancel Queue
+              </button>
+            </div>
+          )}
+
+          {cancelled && (
+            <div className="queue">
+              <h2>❌ Queue Cancelled</h2>
+
+              <p>
+                Your queue has been cancelled successfully.
+              </p>
+
+              <button onClick={joinQueue}>
+                Join Queue Again
+              </button>
             </div>
           )}
         </div>
 
+        {/* QR Card */}
         <div className="card qr-card">
           <h2>📱 Scan QR Code</h2>
 
           <div className="qr-box">
             <QRCodeCanvas
-             value="http://10.79.125.160:5173/"
+              value="http://10.195.7.160:5174/"
               size={200}
             />
           </div>
