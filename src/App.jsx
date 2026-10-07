@@ -9,6 +9,7 @@ function App() {
   const [doctor, setDoctor] = useState("Dr. Mannu");
   const [cancelled, setCancelled] = useState(false);
   const [peopleAhead, setPeopleAhead] = useState(10);
+  const [nowServing, setNowServing] = useState(1);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,6 +19,8 @@ function App() {
         }
         return prev - 1;
       });
+
+      setNowServing((prev) => prev + 1);
     }, 10000);
 
     return () => clearInterval(timer);
@@ -25,7 +28,15 @@ function App() {
 
   function joinQueue() {
     setCancelled(false);
-    setToken((prev) => (prev ? prev + 1 : 1));
+
+    setToken((prev) => {
+      if (prev) {
+        return prev + 1;
+      }
+      return 1;
+    });
+
+    setPeopleAhead(10);
   }
 
   function cancelQueue() {
@@ -36,6 +47,7 @@ function App() {
   return (
     <div className="app">
 
+      {/* Header */}
       <header className="header">
         <h1>🏥 Smart Hospital</h1>
         <p>QR Based Live Queue Management System</p>
@@ -89,8 +101,10 @@ function App() {
             Join Queue
           </button>
 
+          {/* Patient Queue Details */}
           {token && (
             <div className="queue">
+
               <h2>Your Token</h2>
 
               <div className="token">
@@ -114,7 +128,8 @@ function App() {
               </p>
 
               <p>
-                Estimated Wait: <b>{peopleAhead * 5} Minutes</b>
+                Estimated Wait:{" "}
+                <b>{peopleAhead * 5} Minutes</b>
               </p>
 
               <p className="live">
@@ -124,11 +139,14 @@ function App() {
               <button onClick={cancelQueue}>
                 Cancel Queue
               </button>
+
             </div>
           )}
 
+          {/* Cancelled Message */}
           {cancelled && (
             <div className="queue">
+
               <h2>❌ Queue Cancelled</h2>
 
               <p>
@@ -138,24 +156,73 @@ function App() {
               <button onClick={joinQueue}>
                 Join Queue Again
               </button>
+
             </div>
           )}
+
+        </div>
+
+        {/* Live Queue Dashboard */}
+        <div className="card dashboard">
+
+          <h2>📊 Live Queue Dashboard</h2>
+
+          <div className="dashboard-box">
+
+            <div className="dashboard-item">
+              <span>🩺 Now Serving</span>
+              <strong>
+                A-{String(nowServing).padStart(3, "0")}
+              </strong>
+            </div>
+
+            <div className="dashboard-item">
+              <span>🎫 Your Token</span>
+              <strong>
+                {token
+                  ? `A-${String(token).padStart(3, "0")}`
+                  : "--"}
+              </strong>
+            </div>
+
+            <div className="dashboard-item">
+              <span>👥 Patients Ahead</span>
+              <strong>{token ? peopleAhead : "--"}</strong>
+            </div>
+
+            <div className="dashboard-item">
+              <span>⏱ Estimated Wait</span>
+              <strong>
+                {token ? `${peopleAhead * 5} Min` : "--"}
+              </strong>
+            </div>
+
+          </div>
+
+          <p className="live">
+            🟢 Queue is Live
+          </p>
+
         </div>
 
         {/* QR Card */}
         <div className="card qr-card">
+
           <h2>📱 Scan QR Code</h2>
 
           <div className="qr-box">
+
             <QRCodeCanvas
-              value="http://10.195.7.160:5174/"
+              value="http://10.79.125.160:5174/"
               size={200}
             />
+
           </div>
 
           <p>
             Scan this QR code to join the hospital queue.
           </p>
+
         </div>
 
       </main>
