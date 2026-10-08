@@ -22,28 +22,39 @@ function App() {
   const [cancelled, setCancelled] = useState(false);
   const [peopleAhead, setPeopleAhead] = useState(10);
   const [nowServing, setNowServing] = useState(1);
+  const [medicines, setMedicines] = useState(
+  JSON.parse(localStorage.getItem("medicines")) || []);
+  const [medicineName, setMedicineName] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [timing, setTiming] = useState("Morning");
+  const [duration, setDuration] = useState("");
 
   // Save data in localStorage
   useEffect(() => {
-    localStorage.setItem("token", JSON.stringify(token));
-    localStorage.setItem("patientName", patientName);
-    localStorage.setItem("department", department);
-    localStorage.setItem("doctor", doctor);
-  }, [token, patientName, department, doctor]);
+  localStorage.setItem("token", JSON.stringify(token));
+  localStorage.setItem("patientName", patientName);
+  localStorage.setItem("department", department);
+  localStorage.setItem("doctor", doctor);
+}, [token, patientName, department, doctor]);
+
+useEffect(() => {
+  localStorage.setItem("medicines", JSON.stringify(medicines));
+}, [medicines]);
 
   // Join Queue
-  function joinQueue() {
-    setCancelled(false);
+ // Join Queue
+function joinQueue() {
+  setCancelled(false);
 
-    setToken((prev) => {
-      if (prev) {
-        return prev + 1;
-      }
-      return 1;
-    });
+  setToken((prev) => {
+    const newToken = prev ? prev + 1 : 1;
 
-    setPeopleAhead(10);
-  }
+    // Token number = Patients Ahead
+    setPeopleAhead(newToken);
+
+    return newToken;
+  });
+}
 
   // Cancel Queue
   function cancelQueue() {
@@ -63,6 +74,33 @@ function App() {
       return prev - 1;
     });
   }
+  function addMedicine() {
+  if (!medicineName || !dosage || !duration) {
+    alert("Please fill all medicine details");
+    return;
+  }
+
+  const newMedicine = {
+    id: Date.now(),
+    name: medicineName,
+    dosage: dosage,
+    timing: timing,
+    duration: duration,
+  };
+
+  setMedicines((prev) => [...prev, newMedicine]);
+
+  setMedicineName("");
+  setDosage("");
+  setTiming("Morning");
+  setDuration("");
+}
+
+function deleteMedicine(id) {
+  setMedicines((prev) =>
+    prev.filter((medicine) => medicine.id !== id)
+  );
+}
 
   return (
     <div className="app">
@@ -237,6 +275,93 @@ function App() {
           >
             Next Patient
           </button>
+
+        </div>
+                {/* Medicine Tracker */}
+        <div className="card medicine-card">
+
+          <h2>💊 Medicine Tracker</h2>
+
+          <label>Medicine Name</label>
+
+          <input
+            type="text"
+            placeholder="Enter medicine name"
+            value={medicineName}
+            onChange={(e) => setMedicineName(e.target.value)}
+          />
+
+          <label>Dosage</label>
+
+          <input
+            type="text"
+            placeholder="e.g. 1 Tablet"
+            value={dosage}
+            onChange={(e) => setDosage(e.target.value)}
+          />
+
+          <label>Timing</label>
+
+          <select
+            value={timing}
+            onChange={(e) => setTiming(e.target.value)}
+          >
+            <option>Morning</option>
+            <option>Afternoon</option>
+            <option>Night</option>
+            <option>Morning & Night</option>
+          </select>
+
+          <label>Duration</label>
+
+          <input
+            type="text"
+            placeholder="e.g. 5 Days"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+          />
+
+          <button onClick={addMedicine}>
+            ➕ Add Medicine
+          </button>
+
+          {/* Medicine List */}
+          {medicines.length > 0 && (
+            <div className="medicine-list">
+
+              <h3>📋 Prescribed Medicines</h3>
+
+              {medicines.map((medicine) => (
+                <div
+                  className="medicine-item"
+                  key={medicine.id}
+                >
+
+                  <h3>💊 {medicine.name}</h3>
+
+                  <p>
+                    <b>Dosage:</b> {medicine.dosage}
+                  </p>
+
+                  <p>
+                    <b>Timing:</b> {medicine.timing}
+                  </p>
+
+                  <p>
+                    <b>Duration:</b> {medicine.duration}
+                  </p>
+
+                  <button
+                    onClick={() => deleteMedicine(medicine.id)}
+                  >
+                    🗑️ Delete
+                  </button>
+
+                </div>
+              ))}
+
+            </div>
+          )}
 
         </div>
 
