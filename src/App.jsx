@@ -373,7 +373,7 @@ function deleteMedicine(id) {
           <div className="qr-box">
 
             <QRCodeCanvas
-              value="http://10.79.125.160:5174/"
+              value="http://10.79.125.160:5173/"
               size={200}
             />
 
