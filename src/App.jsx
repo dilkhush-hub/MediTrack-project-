@@ -2,6 +2,17 @@ import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import "./App.css";
 
+const doctorsByDepartment = {
+  "General Medicine": ["Dr. Mannu", "Dr. Amit"],
+  "Cardiology": ["Dr. Dilkhush", "Dr. Shubham"],
+  "Orthopedic": ["Dr. Riyansh"],
+  "Dental": ["Dr. Sarthak"],
+  "ENT SPECIALIST": ["Dr. Amit"],
+  "Neurologist": ["Dr. Dilkhush"],
+  "Psychiatrist": ["Dr. Mannu"]
+};
+
+
 function App() {
   const [token, setToken] = useState(
     JSON.parse(localStorage.getItem("token")) || null
@@ -15,9 +26,18 @@ function App() {
     localStorage.getItem("department") || "General Medicine"
   );
 
-  const [doctor, setDoctor] = useState(
-    localStorage.getItem("doctor") || "Dr. Mannu"
-  );
+  
+  const [doctor, setDoctor] = useState(() => {
+  const savedDepartment =
+    localStorage.getItem("department") || "General Medicine";
+  const savedDoctor = localStorage.getItem("doctor");
+  const availableDoctors = doctorsByDepartment[savedDepartment] || [];
+
+  return availableDoctors.includes(savedDoctor)
+    ? savedDoctor
+    : availableDoctors[0] || "";
+  });
+
 
   const [cancelled, setCancelled] = useState(false);
   const [peopleAhead, setPeopleAhead] = useState(10);
@@ -147,13 +167,13 @@ function deleteMedicine(id) {
             value={doctor}
             onChange={(e) => setDoctor(e.target.value)}
           >
-            <option>Dr. Mannu</option>
-            <option>Dr. Amit</option>
-            <option>Dr. Dilkhush</option>
-            <option>Dr. Shubham</option>
-            <option>Dr. Riyansh</option>
-            <option>Dr. Sarthak</option>
+            {(doctorsByDepartment[department] || []).map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
           </select>
+
 
           <button onClick={joinQueue}>
             Join Queue
