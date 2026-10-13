@@ -61,6 +61,15 @@ useEffect(() => {
   localStorage.setItem("medicines", JSON.stringify(medicines));
 }, [medicines]);
 
+useEffect(() => {
+  const availableDoctors = doctorsByDepartment[department] || [];
+
+  if (!availableDoctors.includes(doctor)) {
+    setDoctor(availableDoctors[0] || "");
+  }
+}, [department, doctor]);
+
+
   // Join Queue
  // Join Queue
 function joinQueue() {
